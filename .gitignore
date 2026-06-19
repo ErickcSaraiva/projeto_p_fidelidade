@@ -1,3 +1,32 @@
+# =========================
+# Node/TypeScript (Novos)
+# =========================
+node_modules/
+dist/
+.env
+
+# =========================
+# Python (Antigo Backend)
+# =========================
+venv/
+.venv/
 backend/venv/
 __pycache__/
 *.pyc
+
+# =========================
+# Flutter/Dart (Antigo Mobile)
+# =========================
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# =========================
+# SO e Gerais
+# =========================
+.DS_Store
+*.log
