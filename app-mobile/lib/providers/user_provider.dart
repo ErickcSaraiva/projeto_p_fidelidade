@@ -6,9 +6,12 @@ class UserProvider extends ChangeNotifier {
   String userId = 'user1';
   int balance = 0;
   bool loading = false;
+  bool transactionsLoading = false;
+  List<Map<String, dynamic>> transactions = [];
 
   UserProvider([ApiService? apiService]) : api = apiService ?? ApiService() {
     loadBalance();
+    loadTransactions();
   }
 
   Future<void> loadBalance() async {
@@ -25,6 +28,19 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> loadTransactions() async {
+    transactionsLoading = true;
+    notifyListeners();
+    try {
+      transactions = await api.getTransactions(userId);
+    } catch (e) {
+      transactions = [];
+    } finally {
+      transactionsLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> transfer(int amount, {String machineId = 'machine-1'}) async {
     try {
       final res = await api.transfer(userId, amount, machineId);
@@ -32,6 +48,7 @@ class UserProvider extends ChangeNotifier {
         balance = res['balance'];
         notifyListeners();
       }
+      await loadTransactions();
       return true;
     } catch (e) {
       return false;

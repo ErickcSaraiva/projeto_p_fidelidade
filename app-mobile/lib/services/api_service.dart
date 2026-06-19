@@ -20,4 +20,9 @@ class ApiService {
     });
     return Map<String, dynamic>.from(res.data);
   }
+
+  Future<List<Map<String, dynamic>>> getTransactions(String userId) async {
+    final res = await dio.get('/transactions/$userId');
+    return (res.data as List).map((item) => Map<String, dynamic>.from(item)).toList();
+  }
 }
