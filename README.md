@@ -1,6 +1,8 @@
-# Projeto Teddy's House
+#  Objetivo do Projeto
 
-Monorepo inicial para o projeto de fidelidade "Teddy's House".
+Monorepo inicial para o projeto de fidelidade.
+
+O sistema visa criar um ecossistema de retenção de clientes. O utilizador utiliza um aplicativo para comprar créditos, gerir o seu saldo e cashback, e interagir com máquinas físicas (através de QR Code ou Bluetooth). A gamificação, com mini-jogos (estilo os que existem em apps como a Shopee), é o pilar central para manter o utilizador engajado mesmo quando não está perto da máquina.
 
 ## Estrutura do Repositório
 
