@@ -1,172 +1,58 @@
-#  Objetivo do Projeto
+Fidelidade Gamificada
 
-Monorepo inicial para o projeto de fidelidade.
+Bem-vindo ao repositório, um sistema inovador que une a experiência física de máquinas de brindes (máquinas de urso) com um ecossistema digital de fidelidade e gamificação.
 
-O sistema visa criar um ecossistema de retenção de clientes. O utilizador utiliza um aplicativo para comprar créditos, gerir o seu saldo e cashback, e interagir com máquinas físicas (através de QR Code ou Bluetooth). A gamificação, com mini-jogos (estilo os que existem em apps como a Shopee), é o pilar central para manter o utilizador engajado mesmo quando não está perto da máquina.
+---
 
-## Estrutura do Repositório
+## 🚀 O Projeto
 
-- `app-mobile/` - Flutter app existente com scaffold e telas principais.
-- `backend/` - FastAPI backend existente.
-- `backend-ts/` - Novo backend em Node.js + TypeScript.
-- `mobile-ts/` - Novo app móvel em React Native + TypeScript (Expo).
-- `firmware/` - Código ESP32 e design de validação JSON.
-- `design-assets/` - Assets e imagens do design system.
-- `docs/` - Diagramas e documentação.
+O **projeto** transforma a interação tradicional com máquinas de brindes numa experiência conectada. Os utilizadores podem comprar créditos, ganhar cashback e participar em mini-jogos dentro da aplicação, mantendo o engajamento mesmo fora do local físico.
 
-> Veja também `backend-ts/README.md` e `mobile-ts/README.md` para instruções detalhadas de execução.
+### Principais Funcionalidades
+* **Gestão de Créditos:** Compra de saldo digital para interagir com máquinas físicas.
+* **Integração Física:** Validação segura através de QR Code para ativar as máquinas (controladas por ESP32).
+* **Sistema de Fidelidade:** Acúmulo de cashback a cada transação.
+* **Gamificação:** Mini-jogos integrados no app para retenção e ganho de bónus.
 
-## Estado Atual
+---
 
-### `backend-ts`
+## 🛠 Stack Tecnológica
 
-O mock backend em TypeScript está implementado com Express e serve endpoints compatíveis com o backend original em FastAPI.
+Optámos por uma stack unificada em **TypeScript** para maior produtividade e escalabilidade:
 
-- `backend-ts/src/server.ts`
-- `backend-ts/package.json`
-- `backend-ts/tsconfig.json`
-- `backend-ts/README.md`
+* **Backend:** Node.js com TypeScript e Prisma ORM.
+* **Frontend Mobile:** React Native (com Expo) para Android e iOS.
+* **Banco de Dados:** PostgreSQL para garantir a segurança e integridade das transações.
+* **Integração de Hardware:** ESP32 (Microcontrolador) para o controlo mecânico.
 
-Endpoints disponíveis:
+---
 
-- `GET /health`
-- `POST /auth/login`
-- `GET /balance/:userId`
-- `POST /transfer`
-- `GET /transactions/:userId`
+## 🏗 Arquitetura do Sistema
 
-### `mobile-ts`
+1.  **App Mobile:** Interface do utilizador para gestão de saldo e jogos.
+2.  **API Backend:** Processamento de pagamentos e validação de requisições.
+3.  **Hardware (ESP32):** Interface HMI na máquina física que recebe o sinal de autorização via API.
 
-O app em React Native + TypeScript utiliza Expo e navegação por abas:
+---
 
-- `mobile-ts/App.tsx`
-- `mobile-ts/src/screens/Inicio.tsx`
-- `mobile-ts/src/screens/Balance.tsx`
-- `mobile-ts/src/screens/Transfer.tsx`
-- `mobile-ts/src/services/api.ts`
+## 📊 Status do Projeto
 
-Abas disponíveis:
+- [x] Definição de requisitos e escopo (MVP).
+- [x] Configuração inicial do ambiente de desenvolvimento.
+- [x] Transição para TypeScript.
+- [ ] Implementação do banco de dados (PostgreSQL + Prisma).
+- [ ] Desenvolvimento dos endpoints de transação.
+- [ ] Prototipagem da interface de jogos.
+- [ ] Integração final com ESP32.
 
-- `início`
-- `saldo`
-- `transferência`
+---
 
-O app consome o `backend-ts` através do cliente HTTP em `mobile-ts/src/services/api.ts`.
+## 🤝 Contribuições
 
-### `app-mobile`
+Este é um projeto em desenvolvimento ativo. Sinta-se à vontade para explorar o código, abrir *issues* ou sugerir melhorias!
 
-O app Flutter existente ainda está presente como referência e pode ser usado em paralelo ao stack TypeScript.
-
-## Como executar
-
-### Iniciar o backend TypeScript
-
-```bash
-cd backend-ts
-npm install
-npm run dev
-```
-
-O servidor ouvirá em `http://localhost:8000`.
-
-### Iniciar o app móvel TypeScript
-
-```bash
-cd mobile-ts
-npm install
-npx expo start
-```
-
-Abra no dispositivo/emulador usando Expo.
-
-### Usar o app Flutter existente
-
-```bash
-cd app-mobile
-flutter pub get
-flutter run
-```
-
-Ajuste `app-mobile/lib/config.dart` para o backend local:
-
-- Android emulator: `http://10.0.2.2:8000`
-- iOS simulator: `http://127.0.0.1:8000`
-- Dispositivo físico: `http://<SEU_IP_LOCAL>:8000`
-
-## Testes de endpoints
-
-### Testar saúde do backend
-
-```bash
-curl http://localhost:8000/health
-```
-
-Resposta esperada:
-
-```json
-{"status":"ok"}
-```
-
-### Testar login
-
-```bash
-curl -X POST http://localhost:8000/auth/login
-```
-
-Resposta exemplo:
-
-```json
-{"access_token":"mock-token","user_id":"user1"}
-```
-
-### Testar saldo
-
-```bash
-curl http://localhost:8000/balance/user1
-```
-
-Resposta exemplo:
-
-```json
-{"user_id":"user1","balance":1250}
-```
-
-### Testar transferência
-
-```bash
-curl -X POST http://localhost:8000/transfer \
-  -H "Content-Type: application/json" \
-  -d '{"user_id":"user1","amount":100,"machine_id":"Máquina 1"}'
-```
-
-Resposta exemplo:
-
-```json
-{"status":"ok","tx":{"id":"...","user_id":"user1","amount":100,"machine_id":"Máquina 1"},"balance":1150}
-```
-
-### Testar histórico
-
-```bash
-curl http://localhost:8000/transactions/user1
-```
-
-Resposta exemplo:
-
-```json
-[{"id":"...","user_id":"user1","amount":100,"machine_id":"Máquina 1"}]
-```
-
-## Dicas de desenvolvimento
-
-- Se estiver usando o backend TypeScript, mantenha o `backend-ts` e o `mobile-ts` abertos para testes.
-- Para rodar o app Flutter com backend local, ajuste `API_BASE` em `app-mobile/lib/config.dart` ou use `--dart-define`.
-- Para o app Expo, ajuste `mobile-ts/src/services/api.ts` ou defina `API_BASE` via ambiente.
-
-## Próximos passos sugeridos
-
-- Migrar assets, fontes e imagens para `mobile-ts`.
-- Configurar persistência com banco de dados para `backend-ts`.
-- Adicionar autenticação JWT e armazenamento seguro.
-- Implementar testes automáticos para backend e app.
-- Configurar CI/CD para builds e deploy.
+---
+*Desenvolvido por @Erick Saraiva*
+*full stack*
+README.md
+Exibindo README.md.
