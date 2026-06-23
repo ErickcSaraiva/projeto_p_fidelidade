@@ -1,0 +1,37 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  balance   Float    @default(0.0)
+  cashback  Float    @default(0.0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  transactions Transaction[]
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  userId    String
+  amount    Float
+  type      String
+  machineId String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+model Setting {
+  // Usamos uma String fixa como ID para garantir que só existe 1 registo de configurações no sistema todo
+  id          String   @id @default("GLOBAL") 
+  activeTheme String   @default("default")    // "default", "christmas", "carnival", "easter"
+  particles   String   @default("none")       // "none", "snow", "confetti"
+  updatedAt   DateTime @updatedAt
+
+  @@map("settings")
+}
