@@ -1,13 +1,49 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
+// Configuração do Prisma Client
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
+// Conexão com o banco de dados PostgreSQL
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL") // Vai buscar o link ao teu ficheiro .env
+}
+
+// --------------------------------------------------
+// REGRAS DE NEGÓCIO - TABELAS
+// --------------------------------------------------
+
+// Tabela de Utilizadores (Fidelidade, Saldo e Cashback)
+model User {
+  id           String        @id @default(uuid())
+  username     String        @unique
+  email        String        @unique
+  balance      Float         @default(0.0)
+  cashback     Float         @default(0.0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  
+  // Relacionamento: Um utilizador pode ter várias transações
+  transactions Transaction[] 
+}
+
+// Tabela de Transações (Extrato e Segurança)
+model Transaction {
+  id        String   @id @default(uuid())
+  userId    String
+  amount    Float
+  type      String   // Ex: 'CREDIT_PURCHASE', 'CASHBACK_EARNED', 'MACHINE_UNLOCK'
+  machineId String?  // Opcional, usado quando destranca uma máquina física
+  createdAt DateTime @default(now())
+  
+  // Relacionamento: Esta transação pertence a um User específico
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+// Tabela do Motor de Live-Ops (Temas que fizemos na última sessão)
+model ThemeSettings {
+  id          Int      @id @default(1)
+  theme       String   @default("default")
+  particles   String   @default("none")
+  lastUpdated DateTime @updatedAt
 }

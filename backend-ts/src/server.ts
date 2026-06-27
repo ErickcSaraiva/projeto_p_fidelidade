@@ -1,118 +1,14 @@
-import 'dotenv/config';
-import express, { Request, Response } from 'express';
-import cors from 'cors';
+import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { prisma } from './config/prisma';
 
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
 // ==========================================
-// ROTAS BASE
-// ==========================================
-
-app.get('/', async (_req: Request, res: Response) => {
-  try {
-    const userCount = await prisma.user.count();
-    res.json({
-      status: 'online',
-      mensagem: 'Backend da Catchup Platform a funcionar a 100%!',
-      utilizadores_registados: userCount
-    });
-  } catch (error) {
-    res.status(500).json({ status: 'erro', detalhe: 'Erro ao ligar à base de dados' });
-  }
-});
-
-app.get('/settings/current-theme', async (_req: Request, res: Response) => {
-  try {
-    let config = await prisma.setting.findUnique({
-      where: { id: 'GLOBAL' }
-    });
-
-    if (!config) {
-      config = await prisma.setting.create({
-        data: {
-          id: 'GLOBAL',
-          activeTheme: 'default',
-          particles: 'none'
-        }
-      });
-    }
-
-    return res.json({
-      success: true,
-      theme: config.activeTheme,
-      particles: config.particles,
-      lastUpdated: config.updatedAt
-    });
-  } catch (error) {
-    console.error('Erro ao buscar o tema atual:', error);
-    return res.status(500).json({ error: 'Erro interno a carregar configurações visuais' });
-  }
-});
-
-app.post('/users/credit', async (req: Request, res: Response) => {
-  const { userId, amount } = req.body;
-
-  if (!userId || typeof amount !== 'number' || amount <= 0) {
-    return res.status(400).json({
-      success: false,
-      error: 'Por favor, fornece um userId válido e um valor (amount) maior que zero.'
-    });
-  }
-
-  const CASHBACK_RATE = 0.10;
-  const cashbackEarned = amount * CASHBACK_RATE;
-
-  try {
-    const result = await prisma.$transaction(async (tx) => {
-      const updatedUser = await tx.user.update({
-        where: { id: userId },
-        data: {
-          balance: { increment: amount },
-          cashback: { increment: cashbackEarned }
-        }
-      });
-
-      const transactionRecord = await tx.transaction.create({
-        data: {
-          userId,
-          amount,
-          type: 'PIX_CREDIT_PURCHASE'
-        }
-      });
-
-      return { updatedUser, transactionRecord };
-    });
-
-    return res.json({
-      success: true,
-      message: 'Créditos e Cashback aplicados com sucesso!',
-      depositAmount: amount,
-      cashbackEarned: Number(cashbackEarned.toFixed(2)),
-      newBalance: Number(result.updatedUser.balance.toFixed(2)),
-      newTotalCashback: Number(result.updatedUser.cashback.toFixed(2)),
-      transactionId: result.transactionRecord.id
-    });
-  } catch (error) {
-    console.error('Erro na transação de crédito:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Erro interno ao processar a transação financeira.'
-    });
-  }
-});
-
-// ==========================================
-// MOTOR DE GAMIFICAÇÃO (ANTI-CHEAT)
+// CONFIGURAÇÃO DOS MINI-JOGOS
 // ==========================================
 
 const GAME_CONFIG: Record<string, { maxDurationSeconds: number; maxCoinsPerSecond: number }> = {
-  'coin-collector': { maxDurationSeconds: 30, maxCoinsPerSecond: 3 },
-  'quick-tap':      { maxDurationSeconds: 60, maxCoinsPerSecond: 2 },
+  'coin-collector': { maxDurationSeconds: 30,  maxCoinsPerSecond: 3 },
+  'quick-tap':      { maxDurationSeconds: 60,  maxCoinsPerSecond: 2 },
   'puzzle':         { maxDurationSeconds: 120, maxCoinsPerSecond: 1 },
 };
 
@@ -122,14 +18,19 @@ function generateGameHash(userId: string, gameId: string, startedAt: number): st
   return crypto.createHash('sha256').update(payload).digest('hex');
 }
 
-app.post('/games/start', async (req: Request, res: Response) => {
+// ==========================================
+// INICIAR PARTIDA
+// ==========================================
+
+export const startGame = async (req: Request, res: Response) => {
   const { userId, gameId } = req.body;
 
   if (!userId || !gameId) {
     return res.status(400).json({ success: false, error: 'userId e gameId são obrigatórios.' });
   }
 
-  if (!GAME_CONFIG[gameId]) {
+  const config = GAME_CONFIG[gameId];
+  if (!config) {
     return res.status(400).json({ success: false, error: `Mini-jogo '${gameId}' não reconhecido.` });
   }
 
@@ -145,12 +46,16 @@ app.post('/games/start', async (req: Request, res: Response) => {
     success: true,
     sessionToken,
     startedAt,
-    gameConfig: GAME_CONFIG[gameId],
+    gameConfig: config,
     message: 'Partida iniciada. Guarda o sessionToken para submeter o resultado!'
   });
-});
+};
 
-app.post('/games/reward', async (req: Request, res: Response) => {
+// ==========================================
+// SUBMETER RESULTADO E RECEBER RECOMPENSA
+// ==========================================
+
+export const rewardGame = async (req: Request, res: Response) => {
   const { userId, gameId, earnedCoins, sessionToken, startedAt } = req.body;
 
   if (!userId || !gameId || !sessionToken || !startedAt || typeof earnedCoins !== 'number') {
@@ -183,7 +88,7 @@ app.post('/games/reward', async (req: Request, res: Response) => {
   // ANTI-CHEAT 3: Validar se as moedas são fisicamente possíveis
   const maxPossibleCoins = Math.ceil(elapsedSeconds * config.maxCoinsPerSecond);
   if (earnedCoins > maxPossibleCoins) {
-    console.warn(`🚨 COINS IMPOSSÍVEIS: userId=${userId} pediu ${earnedCoins}, máximo possível=${maxPossibleCoins}`);
+    console.warn(`🚨 COINS IMPOSSÍVEIS: userId=${userId} pediu ${earnedCoins}, máximo=${maxPossibleCoins}`);
     return res.status(400).json({
       success: false,
       error: `Resultado impossível. Máximo alcançável: ${maxPossibleCoins} moedas.`
@@ -221,14 +126,4 @@ app.post('/games/reward', async (req: Request, res: Response) => {
     console.error('Erro ao processar recompensa:', error);
     return res.status(500).json({ success: false, error: 'Erro interno ao registar recompensa.' });
   }
-});
-
-// ==========================================
-// INICIAR SERVIDOR
-// ==========================================
-
-const PORT = process.env.PORT || 8000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor TypeScript rodando em http://localhost:${PORT}`);
-});
+};
