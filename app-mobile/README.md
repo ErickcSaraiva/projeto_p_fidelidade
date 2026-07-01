@@ -1,98 +1,50 @@
-# Teddy's House - Flutter App (scaffold)
+# Welcome to your Expo app 👋
 
-Este diretório contém um scaffold inicial do aplicativo Flutter.
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-Como usar:
+## Get started
+
+1. Install dependencies
+
+   ```bash
+   npm install
+   ```
+
+2. Start the app
+
+   ```bash
+   npx expo start
+   ```
+
+In the output, you'll find options to open the app in a
+
+- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+
+You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Get a fresh project
+
+When you're ready, run:
 
 ```bash
-# no diretório app-mobile
-flutter pub get
-flutter run
+npm run reset-project
 ```
 
-Observações:
-- Copie suas imagens para `assets/images/`.
-- Adicione fontes em `assets/fonts/` e atualize `pubspec.yaml` se necessário.
-- Este é um scaffold inicial com telas placeholder: `Home`, `Games`, `Balance`, `Profile`.
-- Para integrar com o backend, use `dio` e a URL `http://localhost:8000` durante desenvolvimento.
+This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-Configurar `API_BASE`
----------------------
+## Learn more
 
-Por padrão o app usa `lib/config.dart` com `API_BASE = 'http://10.0.2.2:8000'` (Android emulator).
+To learn more about developing your project with Expo, look at the following resources:
 
-- Para rodar em um emulador Android mantenha `10.0.2.2:8000`.
-- Para iOS simulator use `http://127.0.0.1:8000`.
-- Para um dispositivo físico, atualize `lib/config.dart` com o IP da sua máquina, por exemplo `http://192.168.1.100:8000`.
+- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
-Você também pode sobrescrever a base durante `flutter run` usando `--dart-define`:
+## Join the community
 
-```bash
-flutter run --dart-define=API_BASE=http://192.168.1.100:8000
-```
+Join our community of developers creating universal apps.
 
-Ou passe o `baseUrl` direto ao criar `ApiService` no código (útil para testes).
-
-## Checklist de Teste Manual
-
-### 1) Preparação do ambiente
-- [ ] Verificar o diretório correto do backend e do app.
-- [ ] Ativar o virtualenv do backend e iniciar `uvicorn`.
-- [ ] Confirmar `flutter pub get` em `app-mobile`.
-- [ ] Validar dispositivo/emulador com `flutter devices`.
-- [ ] Confirmar URL do backend em `lib/config.dart` ou com `--dart-define`.
-
-### 2) Teste rápido do backend
-- [ ] Acessar `http://127.0.0.1:8000/health` e ver `{"status":"ok"}`.
-- [ ] Acessar `http://127.0.0.1:8000/balance/user1` e verificar saldo retornado.
-- [ ] Fazer POST em `/transfer` com payload válido e verificar resposta de sucesso.
-
-### 3) Tela Home
-- [ ] Verificar o cabeçalho `TEDDY'S HOUSE`.
-- [ ] Conferir o cartão de boas-vindas e descrição.
-- [ ] Confirmar a lista de `Jogos Diários` visível.
-- [ ] Testar interação visual dos cards.
-
-### 4) Tela Games
-- [ ] Navegar para a aba `Games`.
-- [ ] Confirmar o título `Arenas`.
-- [ ] Verificar cards de arena com título e descrição.
-- [ ] Testar rolagem e visualização dos cards.
-
-### 5) Tela Balance
-- [ ] Navegar para a aba `Balance`.
-- [ ] Confirmar exibição de `CASHBACK/SALDO`.
-- [ ] Verificar o saldo atual exibido.
-- [ ] Selecionar valores 50/100/200 e conferir seleção visual.
-- [ ] Testar o botão `Ativar Transferência`.
-- [ ] Testar o botão `Abrir Transferência`.
-
-### 6) Tela Transfer
-- [ ] Confirmar título `Transferir Moedas`.
-- [ ] Verificar animação NFC/QR simulada.
-- [ ] Selecionar diferentes máquinas.
-- [ ] Escolher 50/100/200 moedas.
-- [ ] Tocar em `ATIVAR TRANSFERÊNCIA` e confirmar diálogo de sucesso.
-- [ ] Verificar atualização de saldo após transferência.
-
-### 7) Tela Profile
-- [ ] Navegar para a aba `Profile`.
-- [ ] Confirmar avatar, nome e nível do usuário.
-- [ ] Verificar cartão de meta de recompensas com barra de progresso.
-- [ ] Validar legibilidade de textos e elementos.
-
-### 8) Testes de usabilidade
-- [ ] Girar o dispositivo em retrato/paisagem.
-- [ ] Validar responsividade e ausência de overflow.
-- [ ] Testar rolagem de listas e desempenho.
-
-### 9) Acessibilidade
-- [ ] Navegar por teclado/DPAD (Tab/Shift+Tab, Enter/Space).
-- [ ] Confirmar foco visual em botões e cards.
-- [ ] Verificar labels dos controles principais.
-- [ ] Testar com leitor de tela se possível (TalkBack/VoiceOver).
-
-### 10) Observações finais
-- [ ] Anotar qualquer comportamento inesperado.
-- [ ] Registrar falhas de layout ou botões sem resposta.
-- [ ] Sugerir melhorias de UX com base na experiência.
+- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
+- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
