@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { prisma } from '../config/prisma';
 
 // Definimos uma taxa de Cashback de 10% (0.10)

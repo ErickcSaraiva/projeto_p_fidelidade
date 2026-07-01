@@ -1,38 +1,57 @@
-datasource db {
-  provider = "postgresql"
-
-}
-
+// Configuração do Prisma Client
 generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id        String   @id @default(uuid())
-  username  String   @unique
-  email     String   @unique
-  balance   Float    @default(0.0)
-  cashback  Float    @default(0.0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  transactions Transaction[]
+// Conexão com o banco de dados PostgreSQL
+datasource db {
+  provider = "postgresql"
 }
 
+// --------------------------------------------------
+// REGRAS DE NEGÓCIO - TABELAS
+// --------------------------------------------------
+
+// Tabela de Utilizadores (Fidelidade, Saldo e Cashback)
+model User {
+  id           String        @id @default(uuid())
+  username     String        @unique
+  email        String        @unique
+  balance      Float         @default(0.0)
+  cashback     Float         @default(0.0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  
+  transactions Transaction[] 
+  gameSessions GameSession[] // Relacionamento com os jogos
+}
+
+// Tabela de Transações (Extrato e Segurança)
 model Transaction {
   id        String   @id @default(uuid())
   userId    String
   amount    Float
-  type      String
-  machineId String?
+  type      String   // Ex: 'CREDIT_PURCHASE', 'CASHBACK_EARNED', 'MACHINE_UNLOCK'
+  machineId String?  
   createdAt DateTime @default(now())
+  
   user      User     @relation(fields: [userId], references: [id])
 }
-model Setting {
-  // Usamos uma String fixa como ID para garantir que só existe 1 registo de configurações no sistema todo
-  id          String   @id @default("GLOBAL") 
-  activeTheme String   @default("default")    // "default", "christmas", "carnival", "easter"
-  particles   String   @default("none")       // "none", "snow", "confetti"
-  updatedAt   DateTime @updatedAt
 
-  @@map("settings")
+// Tabela do Motor de Live-Ops (Temas dinâmicos)
+model ThemeSettings {
+  id          Int      @id @default(1)
+  theme       String   @default("default")
+  particles   String   @default("none")
+  lastUpdated DateTime @updatedAt
+}
+
+// NOVA TABELA: Motor de Gamificação (Anti-Cheat / Opção B)
+model GameSession {
+  id          String   @id @default(uuid())
+  userId      String
+  coinsEarned Int
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id])
 }

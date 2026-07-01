@@ -1,8 +1,8 @@
-import 'dotenv/config'; // Importante carregar as variáveis de ambiente primeiro
-import { prisma } from './config/prisma'; // Importa a conexão única
+import 'dotenv/config';
+import { prisma } from './config/prisma';
 
 async function main() {
-  console.log("🌱 A ligar ao PostgreSQL...");
+  console.log("Connecting to PostgreSQL...");
 
   // Exemplo de uso: buscar ou criar um utilizador
   const user = await prisma.user.upsert({
@@ -15,7 +15,7 @@ async function main() {
     },
   });
 
-  console.log("🎉 CLIENTE PRONTO:", user);
+  console.log("Prisma client ready:", user);
 }
 
 main()

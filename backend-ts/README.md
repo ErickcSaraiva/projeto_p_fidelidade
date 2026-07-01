@@ -1,96 +1,77 @@
-# Teddy's House Backend (Node.js + TypeScript)
+# catchup Backend TS
 
-Mock backend em Node.js e TypeScript para o projeto Teddy's House.
+Backend em Node.js, TypeScript, Express e Prisma para o projeto Teddy's House.
 
 ## Estrutura
 
-- `src/server.ts` - servidor Express que expõe os endpoints do mock backend.
-- `package.json` - scripts e dependências.
-- `tsconfig.json` - configuração do TypeScript.
+- `src/server.ts` - entrada do servidor Express.
+- `src/config/prisma.ts` - cliente Prisma unico usado pela API.
+- `src/controllers/` - regras dos endpoints.
+- `src/routes/` - roteadores Express.
+- `prisma/schema.prisma` - modelos do banco PostgreSQL.
+- `prisma/migrations/` - historico de migrations.
+- `dist/` - saida gerada por `npm run build`.
 
-## Endpoints Disponíveis
-
-- `GET /health` - verifica se o backend está ativo.
-- `POST /auth/login` - mock de login, retorna `access_token` e `user_id`.
-- `GET /balance/:userId` - retorna o saldo do usuário.
-- `POST /transfer` - realiza uma transferência de moedas.
-- `GET /transactions/:userId` - lista transações do usuário.
-
-## Como rodar
+## Scripts
 
 ```bash
-cd backend-ts
 npm install
+npm exec prisma generate
+npm run build
 npm run dev
 ```
 
-O servidor iniciará em `http://localhost:8000`.
+Use `npm exec prisma validate` para validar o schema.
 
-## Testes de endpoint
+## Variaveis de ambiente
 
-### 1) Health check
+Crie ou mantenha `backend-ts/.env` com:
+
+```bash
+DATABASE_URL="postgresql://usuario:senha@localhost:5432/catchup"
+GAME_SECRET="troque-este-segredo"
+PORT=8000
+```
+
+## Endpoints
+
+- `GET /health`
+- `POST /auth/login`
+- `GET /balance/:userId`
+- `POST /transfer`
+- `GET /transactions/:userId`
+- `POST /users/credit`
+- `POST /games/start`
+- `POST /games/reward`
+
+## Exemplos
 
 ```bash
 curl http://localhost:8000/health
 ```
 
-Resposta esperada:
-
-```json
-{"status":"ok"}
-```
-
-### 2) Login
-
 ```bash
 curl -X POST http://localhost:8000/auth/login
 ```
-
-Resposta exemplo:
-
-```json
-{"access_token":"mock-token","user_id":"user1"}
-```
-
-### 3) Saldo
 
 ```bash
 curl http://localhost:8000/balance/user1
 ```
 
-Resposta exemplo:
-
-```json
-{"user_id":"user1","balance":1250}
-```
-
-### 4) Transferência
-
 ```bash
 curl -X POST http://localhost:8000/transfer \
   -H "Content-Type: application/json" \
-  -d '{"user_id":"user1","amount":100,"machine_id":"Máquina 1"}'
+  -d '{"user_id":"user1","amount":100,"machine_id":"machine-1"}'
 ```
-
-Resposta exemplo:
-
-```json
-{"status":"ok","tx":{"id":"...","user_id":"user1","amount":100,"machine_id":"Máquina 1"},"balance":1150}
-```
-
-### 5) Histórico de transações
 
 ```bash
-curl http://localhost:8000/transactions/user1
+curl -X POST http://localhost:8000/users/credit \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"user1","amount":100}'
 ```
 
-Resposta exemplo:
+## Observacoes de QA
 
-```json
-[{"id":"...","user_id":"user1","amount":100,"machine_id":"Máquina 1"}]
-```
-
-## Observações
-
-- O backend usa armazenamento em memória para prototipagem; reiniciar o servidor zera as transações.
-- Para persistência real, adicione banco de dados e models.
+- O TypeScript compila para `dist`, mantendo `src` sem arquivos gerados.
+- O backend depende de PostgreSQL acessivel pela `DATABASE_URL`.
+- `POST /auth/login` cria/garante o usuario demo `user1` para facilitar testes locais do app mobile.

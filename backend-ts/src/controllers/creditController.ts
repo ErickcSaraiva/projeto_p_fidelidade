@@ -1,10 +1,16 @@
-import { Request, Response } from 'express';
-import { Prisma } from '@prisma/client';
+import type { Request, Response } from 'express';
 import { prisma } from '../config/prisma';
 
 export const processCreditPurchase = async (req: Request, res: Response) => {
   const { userId, amount } = req.body;
   const cashbackRate = 0.10; // 10%
+
+  if (!userId || typeof amount !== 'number' || amount <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'userId and a positive numeric amount are required.'
+    });
+  }
 
   try {
     // A chave aqui é que o TypeScript vai inferir o tipo de 'tx' automaticamente
